@@ -24,64 +24,75 @@ SOFTWARE.
 
 import datetime
 
+
 class LogManager:
-	def __init__(self, logs_directory,event_id=None):
-		self.logs_directory = logs_directory
-		self.event_id = event_id
-		self.open_files= {}
-	
+    def __init__(self, logs_directory, event_id=None):
+        self.logs_directory = logs_directory
+        self.event_id = event_id
+        self.open_files = {}
 
-	def parseFilename(self,filename):
-		if filename==None:
-			return None
-		filename = str(filename)
-		filename = filename.replace(".log","")
-		if self.event_id!=None:
-			filename+="_"+str(self.event_id)
-		filename+=".log"
-		return filename
+    def parseFilename(self, filename):
+        if filename is None:
+            return None
+        filename = str(filename)
+        filename = filename.replace(".log", "")
+        if self.event_id is not None:
+            filename += "_" + str(self.event_id)
+        filename += ".log"
+        return filename
 
-	def log(self,filename,*kwdata):
-		filename = self.parseFilename(filename)
+    def log(self, filename, *kwdata):
+        filename = self.parseFilename(filename)
 
-		if filename in self.open_files:
-			w=self.open_files[filename]
-		else:
-			w = open(self.logs_directory+"/"+filename,"w")
-			self.open_files[filename]=w
-			w.write("File "+str(filename)+" created at "+str(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))+"\n")
-	
-		for elem in kwdata:
-			w.write(str(elem)+" ")
-		w.write("\n")
-	
-	def close(self, filename=None):
-		filename = self.parseFilename(filename)
-		if filename==None:
-			for filename,w in self.open_files.iteritems():
-				w.write("File "+str(filename)+" closed at "+str(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))+"\n")
-				w.close()
-		else:
-			w = self.open_files[filename]
-			w.write("File "+str(filename)+" closed at "+str(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))+"\n")
-			del self.open_files[filename]
+        if filename in self.open_files:
+            w = self.open_files[filename]
+        else:
+            w = open(self.logs_directory + "/" + filename, "w")
+            self.open_files[filename] = w
+            w.write("File " +
+                    str(filename) +
+                    " created at " +
+                    str(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')) +
+                    "\n")
 
-	def flush(self,filename=None):
-		filename = self.parseFilename(filename)
-		if filename==None:
-			for filename,w in self.open_files.iteritems():
-				w.flush()
-		else:
-			self.open_files[filename].flush()
+        for elem in kwdata:
+            w.write(str(elem) + " ")
+        w.write("\n")
+
+    def close(self, filename=None):
+        filename = self.parseFilename(filename)
+        if filename is None:
+            for filename, w in self.open_files.iteritems():
+                w.write("File " +
+                        str(filename) +
+                        " closed at " +
+                        str(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')) +
+                        "\n")
+                w.close()
+        else:
+            w = self.open_files[filename]
+            w.write("File " +
+                    str(filename) +
+                    " closed at " +
+                    str(datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')) +
+                    "\n")
+            del self.open_files[filename]
+
+    def flush(self, filename=None):
+        filename = self.parseFilename(filename)
+        if filename is None:
+            for filename, w in self.open_files.iteritems():
+                w.flush()
+        else:
+            self.open_files[filename].flush()
 
 
-if __name__=="__main__":
-	log = LogManager("test")
-	log.log("log1.log",1234,"hola amigo",[1,2,3])
-	log.log("log1.log",1234,"hola amigo",[1,2,3])
-	log.log("log1.log",1234,"hola amigo",[1,2,3])
-	log.flush("log1")
-	log.log("log1.log",1234,"ahola amigo",[1,2,3])
-	log.close("log1")
-	log.close()
-
+if __name__ == "__main__":
+    log = LogManager("test")
+    log.log("log1.log", 1234, "hola amigo", [1, 2, 3])
+    log.log("log1.log", 1234, "hola amigo", [1, 2, 3])
+    log.log("log1.log", 1234, "hola amigo", [1, 2, 3])
+    log.flush("log1")
+    log.log("log1.log", 1234, "ahola amigo", [1, 2, 3])
+    log.close("log1")
+    log.close()
