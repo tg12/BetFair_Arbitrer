@@ -62,7 +62,7 @@ class LogManager:
     def close(self, filename=None):
         filename = self.parseFilename(filename)
         if filename is None:
-            for filename, w in self.open_files.items():
+            for filename, w in self.open_files.iteritems():
                 w.write("File " +
                         str(filename) +
                         " closed at " +
@@ -81,7 +81,7 @@ class LogManager:
     def flush(self, filename=None):
         filename = self.parseFilename(filename)
         if filename is None:
-            for filename, w in self.open_files.items():
+            for filename, w in self.open_files.iteritems():
                 w.flush()
         else:
             self.open_files[filename].flush()

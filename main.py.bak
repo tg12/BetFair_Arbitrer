@@ -31,13 +31,12 @@ import random
 import sys
 import datetime
 import manager
-import pickle
+import cPickle
 import pprint
 import operator
 import traceback
 import logmanager
-import importlib
-importlib.reload(manager)
+reload(manager)
 sys.dont_write_bytecode = True
 
 
@@ -118,7 +117,8 @@ if __name__ == "__main__":
 #		best_bets_each_market_array_dicts_and_info.append(parallelTask(i))
 
     # Remove all Falses
-    best_bets_each_market_array_dicts_and_info = [a for a in best_bets_each_market_array_dicts_and_info if a]
+    best_bets_each_market_array_dicts_and_info = filter(
+        lambda a: a, best_bets_each_market_array_dicts_and_info)
 
     # END PARALLEL
     log.log("main", "Done paralell task, now finding the best of the 'best'")
@@ -129,15 +129,15 @@ if __name__ == "__main__":
     event_name_to_id = {}
     event_name_to_date = {}
     for bets_events_dict_tmp, event_name_to_id_tmp, event_name_to_date_tmp in best_bets_each_market_array_dicts_and_info:
-        if len(list(bets_events_dict_tmp.keys())) > 0:
-            event_name = list(bets_events_dict_tmp.keys())[0]
+        if len(bets_events_dict_tmp.keys()) > 0:
+            event_name = bets_events_dict_tmp.keys()[0]
             bets_events_dict[event_name] = bets_events_dict_tmp[event_name]
             event_name_to_id[event_name] = event_name_to_id_tmp[event_name]
             event_name_to_date[event_name] = event_name_to_date_tmp[event_name]
 
     # Done
     best_bets = []
-    for event_name, v in bets_events_dict.items():
+    for event_name, v in bets_events_dict.iteritems():
         if len(v) == 0:
             log.log("main", "Nothing found")
             break
@@ -168,16 +168,16 @@ if __name__ == "__main__":
             except BaseException:
                 a = []
                 w = open(previous_bets_filename, "w")
-                pickle.dump(a, w)
+                cPickle.dump(a, w)
                 w.close()
-            previous_bets_event_id = pickle.load(open(previous_bets_filename))
+            previous_bets_event_id = cPickle.load(open(previous_bets_filename))
 
             event_id = str(best_bets[0][2])
             if not(event_id in previous_bets_event_id):
                 m.executeBet(best_bets[0], system_username)
                 previous_bets_event_id.append(event_id)
                 w = open(previous_bets_filename, "w")
-                pickle.dump(previous_bets_event_id[-10:], w)
+                cPickle.dump(previous_bets_event_id[-10:], w)
                 w.close()
                 log.log("main", "Appending to paperbet_file")
                 a = open(

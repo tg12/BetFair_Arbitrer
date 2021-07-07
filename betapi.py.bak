@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import urllib.request, urllib.parse, urllib.error
-import urllib.request, urllib.error, urllib.parse
+import urllib
+import urllib2
 import json
 import datetime
 import sys
@@ -34,15 +34,15 @@ sys.dont_write_bytecode = True
 
 def getSESSIONToken(username, password):
 
-    login_data = urllib.parse.urlencode({
+    login_data = urllib.urlencode({
         'username': username,
         'password': password,
         'product': 'exchange',
         'url': 'https://www.betfair.com/Fexchange/login/success/rurl/https://www.betfair.com/Fexchange'
     })
     url = "https://identitysso.betfair.com/api/login"
-    req = urllib.request.Request(url, login_data)
-    response = urllib.request.urlopen(req)
+    req = urllib2.Request(url, login_data)
+    response = urllib2.urlopen(req)
     the_page = response.read()
     cookie = response.info()['set-cookie']
     idx = cookie.find("ssoid=") + 6
@@ -80,9 +80,9 @@ class BetApi:
         self.cache = {}
 
     def getAccountFunds(self):
-        req = {'id': 1,
-               'jsonrpc': '2.0',
-               'method': 'AccountAPING/v1.0/getAccountFunds',
+        req = {u'id': 1,
+               u'jsonrpc': u'2.0',
+               u'method': u'AccountAPING/v1.0/getAccountFunds',
                }
 
         response = self.callAccountApiNG(req)
@@ -155,7 +155,7 @@ class BetApi:
         events_ids = [v['event']['id'] for v in event_list]
         events_names = [v['event']['name'] for v in event_list]
         events_dates = [v['event']['openDate'] for v in event_list]
-        return list(zip(events_ids, events_names, events_dates))
+        return zip(events_ids, events_names, events_dates)
 
     def selectEvent(self, event_id):
         self.flushCache()
@@ -423,13 +423,13 @@ class BetApi:
         return odds, market_id
 
     def getOddsForMarket(self, market_id):
-        req = {'id': 1,
-               'jsonrpc': '2.0',
-               'method': 'SportsAPING/v1.0/listMarketBook',
-               'params': {
-                   'marketIds': [market_id],
-                   'priceProjection': {
-                       'priceData': ['EX_BEST_OFFERS']
+        req = {u'id': 1,
+               u'jsonrpc': u'2.0',
+               u'method': u'SportsAPING/v1.0/listMarketBook',
+               u'params': {
+                   u'marketIds': [market_id],
+                   u'priceProjection': {
+                       u'priceData': [u'EX_BEST_OFFERS']
                    }
                }
                }
@@ -441,15 +441,15 @@ class BetApi:
         endtime = now + datetime.timedelta(hours=hours)
         now = now.strftime('%Y-%m-%dT%H:%M:%SZ')
         endtime = endtime.strftime('%Y-%m-%dT%H:%M:%SZ')
-        req = {'id': 1,
-               'jsonrpc': '2.0',
-               'method': 'SportsAPING/v1.0/listEvents',
-               'params': {
-                   'filter':
+        req = {u'id': 1,
+               u'jsonrpc': u'2.0',
+               u'method': u'SportsAPING/v1.0/listEvents',
+               u'params': {
+                   u'filter':
                    {
-                       'eventTypeIds': ['1'],
-                       'inplay': False,
-                       'marketStartTime': {
+                       u'eventTypeIds': [u'1'],
+                       u'inplay': False,
+                       u'marketStartTime': {
                            'from': now,
                            'to': endtime,
                        }
@@ -460,17 +460,17 @@ class BetApi:
         return self.callApiNG(req)
 
     def getMarketsForEvent(self, events_id):
-        req = {'id': 1,
-               'jsonrpc': '2.0',
-               'method': 'SportsAPING/v1.0/listMarketCatalogue',
-               'params': {
-                   'filter':
+        req = {u'id': 1,
+               u'jsonrpc': u'2.0',
+               u'method': u'SportsAPING/v1.0/listMarketCatalogue',
+               u'params': {
+                   u'filter':
                    {
-                       'eventTypeIds': ['1'],
-                       'eventIds': [events_id]
+                       u'eventTypeIds': [u'1'],
+                       u'eventIds': [events_id]
                    },
-                   'maxResults': '1000',
-                   'marketProjection': ['RUNNER_METADATA'],
+                   u'maxResults': u'1000',
+                   u'marketProjection': [u'RUNNER_METADATA'],
                }
                }
         return self.callApiNG(req)
@@ -478,8 +478,8 @@ class BetApi:
     def callApiNG(self, req_dict):
         encoder = json.JSONEncoder()
         jsonrpc_req = encoder.encode(req_dict)
-        req = urllib.request.Request(self.url, jsonrpc_req, self.headers)
-        response = urllib.request.urlopen(req).read()
+        req = urllib2.Request(self.url, jsonrpc_req, self.headers)
+        response = urllib2.urlopen(req).read()
         response_loads = json.loads(response)
         try:
             results = response_loads['result']
@@ -490,8 +490,8 @@ class BetApi:
     def callAccountApiNG(self, req_dict):
         encoder = json.JSONEncoder()
         jsonrpc_req = encoder.encode(req_dict)
-        req = urllib.request.Request(self.url_account, jsonrpc_req, self.headers)
-        response = urllib.request.urlopen(req).read()
+        req = urllib2.Request(self.url_account, jsonrpc_req, self.headers)
+        response = urllib2.urlopen(req).read()
         response_loads = json.loads(response)
         try:
             results = response_loads['result']
@@ -509,7 +509,7 @@ class BetApi:
                     d['ex']['availableToBack'], d['ex']['availableToLay']):
                 odds[d['selectionId']].append((back['price'], back['size']))
                 odds[d['selectionId']].append((lay['price'], -lay['size']))
-        odds_keys = list(odds.keys())
+        odds_keys = odds.keys()
         for k in odds_keys:
             odds[runners_id_to_name[k]] = odds.pop(k)
         return odds

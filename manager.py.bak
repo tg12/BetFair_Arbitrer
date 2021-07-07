@@ -32,11 +32,10 @@ import betapi
 import traceback
 import operator
 from betapi import BetApi
-import importlib
-importlib.reload(betapi)
-importlib.reload(estimator)
+reload(betapi)
+reload(estimator)
 sys.dont_write_bytecode = True
-importlib.reload(kelly)
+reload(kelly)
 
 
 def getLimOrderValue(odds, volume):
@@ -67,14 +66,14 @@ def printCSVLineFromBestBets(best_bets):
         market_name = str(best_bet[3])
         r_expected = "%.5f" % best_bet[4]
         bet = ""
-        for k, v in best_bet[5].items():
+        for k, v in best_bet[5].iteritems():
             if abs(v) > 0.01:
                 odds = np.array(best_bet[6]['odds_actual'][k])
                 volume = v
                 bet += k + ": " + "%.2f" % volume
                 bet += " @ %.2f (LIM)" % getLimOrderValue(odds, volume)
         calculated_relevant_odds = ""
-        for k, v in best_bet[6]['odds_calculated'].items():
+        for k, v in best_bet[6]['odds_calculated'].iteritems():
             calculated_relevant_odds += k + ": " + "%.2f" % v + ", "
         actual_odds = str(
             best_bet[6]['odds_actual']).replace(
@@ -115,7 +114,7 @@ def getValueFromDict(d, v):
     except BaseException:
         for lim in range(1, 100):
             num_found = 0
-            for k in list(d.keys()):
+            for k in d.keys():
                 if k[:lim] == v[:lim]:
                     num_found += 1
                     val = d[k]
@@ -130,7 +129,7 @@ def getValueFromDict(d, v):
     homeTeam_indice, awayTeam_indice = v.split("/")
     for lim in range(1, 100):
         num_found = 0
-        for k in list(d.keys()):
+        for k in d.keys():
             homeTeam_key, awayTeam_key = k.split("/")
             if homeTeam_key[:lim] == homeTeam_indice[:
                                                      lim] and awayTeam_key[:lim] == awayTeam_indice[:lim]:
@@ -329,7 +328,7 @@ class Manager:
         event_id = str(bet[2])
         market_name = str(bet[3])
         market_id = bet[6]['market_id']
-        for k, v in bet[5].items():
+        for k, v in bet[5].iteritems():
             if abs(v) > 0.01:
                 odds = np.array(bet[6]['odds_actual'][k])
                 volume = v

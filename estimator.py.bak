@@ -26,8 +26,7 @@ import pprint
 import numpy as np
 import sys
 import pyodds
-import importlib
-importlib.reload(pyodds)
+reload(pyodds)
 sys.dont_write_bytecode = True
 
 

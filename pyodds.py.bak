@@ -40,7 +40,7 @@ def getValueFromDict(d, v):
     except BaseException:
         for lim in range(1, 100):
             num_found = 0
-            for k in list(d.keys()):
+            for k in d.keys():
                 if k[:lim] == v[:lim]:
                     num_found += 1
                     val = d[k]
@@ -55,7 +55,7 @@ def getValueFromDict(d, v):
     homeTeam_indice, awayTeam_indice = v.split("/")
     for lim in range(1, 100):
         num_found = 0
-        for k in list(d.keys()):
+        for k in d.keys():
             homeTeam_key, awayTeam_key = k.split("/")
             if homeTeam_key[:lim] == homeTeam_indice[:
                                                      lim] and awayTeam_key[:lim] == awayTeam_indice[:lim]:
@@ -173,9 +173,9 @@ def getLambdas(odds_dict_raw, homeTeam, awayTeam, log):
     import scipy.optimize
 
     actual_odds_dict = {}
-    for market_name, odds_dict in odds_dict_raw.items():
+    for market_name, odds_dict in odds_dict_raw.iteritems():
         tmp = {}
-        for runner_name, odds_list in odds_dict.items():
+        for runner_name, odds_list in odds_dict.iteritems():
             if len(odds_list) == 0:
                 tmp[runner_name] = [1.0, 100000.0]
             else:
