@@ -128,4 +128,7 @@ if __name__ == "__main__":
         bet_vector = kelly(odds, money, probs, fee, last_E)
         sumv += bet_vector
         r, last_E = r_func(bet_vector, odds, money, probs, fee, last_E)
-        print(r, last_E, bet_vector, r_func(sumv, odds, money, probs, fee, [0, 0, 0])[0])
+        print(
+            r, last_E, bet_vector, r_func(
+                sumv, odds, money, probs, fee, [
+                    0, 0, 0])[0])

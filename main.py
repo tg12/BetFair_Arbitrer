@@ -66,7 +66,7 @@ if __name__ == "__main__":
     fee = 0.05
     hours_to_find_events = 0.5
 
-    raise Exception("Please read the source code carefully before running it!")
+    #raise Exception("Please read the source code carefully before running it!")
 
     logs_directory = sys.argv[1]
     log = logmanager.LogManager(logs_directory)
@@ -118,7 +118,8 @@ if __name__ == "__main__":
 #		best_bets_each_market_array_dicts_and_info.append(parallelTask(i))
 
     # Remove all Falses
-    best_bets_each_market_array_dicts_and_info = [a for a in best_bets_each_market_array_dicts_and_info if a]
+    best_bets_each_market_array_dicts_and_info = [
+        a for a in best_bets_each_market_array_dicts_and_info if a]
 
     # END PARALLEL
     log.log("main", "Done paralell task, now finding the best of the 'best'")

@@ -22,8 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import urllib.request, urllib.parse, urllib.error
-import urllib.request, urllib.error, urllib.parse
+import urllib.request
+import urllib.parse
+import urllib.error
+import urllib.request
+import urllib.error
+import urllib.parse
+import requests
 import json
 import datetime
 import sys
@@ -32,22 +37,45 @@ import datetime
 sys.dont_write_bytecode = True
 
 
-def getSESSIONToken(username, password):
+def getSESSIONToken(username, password, key):
+    """########################################
+    ########################################
+    ########################################
+    # login_data = urllib.parse.urlencode({
+        # 'username': username,
+        # 'password': password,
+        # 'product': 'exchange',
+        # 'url': 'https://www.betfair.com/Fexchange/login/success/rurl/https://www.betfair.com/Fexchange'
+    # })
+    # url = "https://identitysso.betfair.com/api/login"
+    # req = urllib.request.Request(url, login_data)
+    # response = urllib.request.urlopen(req)
+    # the_page = response.read()
+    # cookie = response.info()['set-cookie']
+    # idx = cookie.find("ssoid=") + 6
+    # SESSION_TOKEN = cookie[idx:].split(";")[0]
+    ########################################
+    ########################################
+    ########################################"""
+    pre_auth_headers = {
+    'Accept': 'application/json',
+    'X-Application': key,
+    }
 
-    login_data = urllib.parse.urlencode({
+    data = {
         'username': username,
-        'password': password,
-        'product': 'exchange',
-        'url': 'https://www.betfair.com/Fexchange/login/success/rurl/https://www.betfair.com/Fexchange'
-    })
-    url = "https://identitysso.betfair.com/api/login"
-    req = urllib.request.Request(url, login_data)
-    response = urllib.request.urlopen(req)
-    the_page = response.read()
-    cookie = response.info()['set-cookie']
-    idx = cookie.find("ssoid=") + 6
-    SESSION_TOKEN = cookie[idx:].split(";")[0]
+        'password':  password
+    }
 
+    response = requests.post(
+        'https://identitysso.betfair.com/api/login',
+        headers=pre_auth_headers,
+        data=data,
+        verify=False)
+
+    # print(json.dumps(json.loads(response.text), indent=3))
+    parsed_json = json.loads(response.text)
+    SESSION_TOKEN = parsed_json["token"]
     return SESSION_TOKEN
 
 
@@ -64,12 +92,12 @@ class BetApi:
         self.key = key
         self.username = username
         self.password = password
-        self.session_token = getSESSIONToken(username, password)
+        self.session_token = getSESSIONToken(username, password, key)
         self.headers = {
             'X-Application': key,
             'X-Authentication': self.session_token,
             'content-type': 'application/json'}
-        self.url = "https://api.betfair.com/exchange/betting/json-rpc/v1"
+        self.url = "https://api.betfair.com/exchange/betting/json-rpc/v1/"
         self.url_account = "https://api.betfair.com/exchange/account/json-rpc/v1"
         self.cache = {}
 
@@ -476,11 +504,20 @@ class BetApi:
         return self.callApiNG(req)
 
     def callApiNG(self, req_dict):
-        encoder = json.JSONEncoder()
-        jsonrpc_req = encoder.encode(req_dict)
-        req = urllib.request.Request(self.url, jsonrpc_req, self.headers)
-        response = urllib.request.urlopen(req).read()
-        response_loads = json.loads(response)
+        """###################################
+        ###################################
+        ###################################
+        # encoder = json.JSONEncoder()
+        # jsonrpc_req = encoder.encode(req_dict)
+        # req = urllib.request.Request(self.url, jsonrpc_req, self.headers)
+        # response = urllib.request.urlopen(req).read()
+        # print ("[+]debug, ... JSON....") 
+        # print (req_dict)
+        ###################################
+        ###################################
+        ###################################"""
+        response = requests.post(self.url, json=req_dict, headers=self.headers)
+        response_loads = response.json()
         try:
             results = response_loads['result']
             return results
@@ -488,11 +525,21 @@ class BetApi:
             raise Exception('Exception from API-NG ' + str(response_loads))
 
     def callAccountApiNG(self, req_dict):
-        encoder = json.JSONEncoder()
-        jsonrpc_req = encoder.encode(req_dict)
-        req = urllib.request.Request(self.url_account, jsonrpc_req, self.headers)
-        response = urllib.request.urlopen(req).read()
-        response_loads = json.loads(response)
+        """###################################
+        ###################################
+        ###################################
+        # encoder = json.JSONEncoder()
+        # jsonrpc_req = encoder.encode(req_dict)
+        # req = urllib.request.Request(
+            # self.url_account, jsonrpc_req, self.headers)
+        # response = urllib.request.urlopen(req).read()
+        # print ("[+]debug, ... JSON....") 
+        # print (req_dict)
+        ###################################
+        ###################################
+        ###################################"""
+        response = requests.post(self.url_account, json=req_dict, headers=self.headers)
+        response_loads = response.json()
         try:
             results = response_loads['result']
             return results
